@@ -66,11 +66,44 @@ You can customize the **Username** and **password** from **application.propertie
 	spring.security.user.password= pass
 
 
+>### Security in a Spring MVC Application
 
+We can either implements the interface called WebSecurityConfigurer or extend the more convenient class called WebSecurityConfigurerAdapter. The advantage of extending the adapter class is that we can configure Web security by overriding only those parts that we are interested in; others can remain their default form.
 
+	// The annotation @EnableWebSecurity enables Web security; otherwise, it remains disabled by default.
+	@Configuration
+	@EnableWebSecurity
+	public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	}
 
+**There are three different type of the configure method that can be override to configure and secure the application :**
 
+* void configure( AuthenticationManagerBuilder auth): To configure user details services
+* void configure( HttpSecurity http): To configure how requests are secured by interceptors
+* void configure( WebSecurity web): To configure Spring Security's filter chain
 
+> **configure( AuthenticationManagerBuilder auth)**
 
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	
+		auth.inMemoryAuthentication()
+			.withUser("admin").password("{noop}pass").roles("ADMIN");
+			.and()
+			.withUser("user").password("{noop}pass").roles("USER")
+	}
+	
+> **configure( HttpSecurity http)**
 
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
 
+		http.cors().disable()
+			.authorizeRequests().antMatchers("/api/admin/**").hasAnyRole("ADMIN")
+			.and().authorizeRequests().antMatchers("/api/user/**").hasAnyRole("USER")
+			.and().formLogin();
+	}
+	
+> **configure( WebSecurity web)**
+
+**Note :** The default filter chain is fine for most needs.
