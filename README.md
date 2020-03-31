@@ -107,3 +107,28 @@ We can either implements the interface called WebSecurityConfigurer or extend th
 > **configure( WebSecurity web)**
 
 **Note :** The default filter chain is fine for most needs.
+
+>### UserDetailsService userDetailsService(); 
+ 
+* Core interface which loads user-specific data. 
+* It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider.
+* The interface requires only one read-only method, which simplifies support for new data-access strategies.
+* It can be use **UserDetailsService userDetailsService()** in place of **void configure(AuthenticationManagerBuilder auth)**
+
+> Way to use UserDetailsService interface
+
+	@Bean
+	@Override
+	public UserDetailsService userDetailsService() {
+
+		/* Create single User */
+		// UserDetails userDetails = User.withDefaultPasswordEncoder().username("vikash").password("pass").roles("USER").build();
+
+		// Create multiple User
+		List<UserDetails> userDetails = new ArrayList<>();
+		userDetails.add(User.withDefaultPasswordEncoder().username("user").password("pass").roles("USER").build());
+		userDetails.add(User.withDefaultPasswordEncoder().username("admin").password("pass").roles("ADMIN").build());
+
+		return new InMemoryUserDetailsManager(userDetails);
+	}	 
+
