@@ -132,3 +132,20 @@ We can either implements the interface called WebSecurityConfigurer or extend th
 		return new InMemoryUserDetailsManager(userDetails);
 	}	 
 
+>### AuthenticationProvider vs UserDetailsService
+
+UserDetailsService is not an alternative to AuthenticationProvider but it is used for a different purpose i.e. to load user details. Typically, an AuthenticationProvider implementation can use UserDetailsService instance to retrieve user details during its authentication process. For example, DaoAuthenticationProvider, in case of JDBC-authentication, uses JdbcUserDetailsManager as an implementation of UserDetailsService. In case of in-memory authentication, DaoAuthenticationProvider uses InMemoryUserDetailsManager implementation. [more details](#https://www.logicbig.com/tutorials/spring-framework/spring-security/user-details-service.html)
+
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
+	@Bean
+	public AuthenticationProvider authProvider() {
+		
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setUserDetailsService(userDetailsService);
+		provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+		return provider;
+	}
+	
+	
