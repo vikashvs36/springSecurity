@@ -52,7 +52,7 @@ There are created three API. First two is for User role and the last and third o
 	</dependency>
 	
 As you will add the Spring-boot-starter-security, the whole application will be secure that means, you can't access any page or Url without given Username and Password.
-The Spring security will give the default login page with default url **/login**. e.g - [http://localhost:8080/login](#http://localhost:8080/login) 
+The Spring security will give the default login page with default url **/login**. e.g - [http://localhost:8080/login](http://localhost:8080/login) 
 
 ![](images/loginPage.PNG)
 
@@ -132,9 +132,11 @@ We can either implements the interface called WebSecurityConfigurer or extend th
 		return new InMemoryUserDetailsManager(userDetails);
 	}	 
 
->### AuthenticationProvider vs UserDetailsService
+>### Login through Database
 
-UserDetailsService is not an alternative to AuthenticationProvider but it is used for a different purpose i.e. to load user details. Typically, an AuthenticationProvider implementation can use UserDetailsService instance to retrieve user details during its authentication process. For example, DaoAuthenticationProvider, in case of JDBC-authentication, uses JdbcUserDetailsManager as an implementation of UserDetailsService. In case of in-memory authentication, DaoAuthenticationProvider uses InMemoryUserDetailsManager implementation. [more details](#https://www.logicbig.com/tutorials/spring-framework/spring-security/user-details-service.html)
+> AuthenticationProvider vs UserDetailsService
+
+UserDetailsService is not an alternative to AuthenticationProvider but it is used for a different purpose i.e. to load user details. Typically, an AuthenticationProvider implementation can use UserDetailsService instance to retrieve user details during its authentication process. For example, DaoAuthenticationProvider, in case of JDBC-authentication, uses JdbcUserDetailsManager as an implementation of UserDetailsService. In case of in-memory authentication, DaoAuthenticationProvider uses InMemoryUserDetailsManager implementation. [more details](https://www.logicbig.com/tutorials/spring-framework/spring-security/user-details-service.html)
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -182,3 +184,18 @@ the object of interface. So, we have to implement UserDetails and override all m
 		// Override All methods.
 	}
 	
+>### BCrypt Password Encoder
+	
+Here we are using plane text password to login but as you know it will have to change into encrypted for protected or safety purpose. So I am going to use Secure Hash Algorithms (SHA) key because it's give facility to use your password how much small or larger, It will give output constant length.
+
+By default spring have a library of BCrypt password encoder. So First of all we have to save password into database after generate encrypted it. To generate encrypted your password you can get it from [click here](https://www.browserling.com/tools/bcrypt). Manually added encrypted password below in data.sql file : 
+
+	insert into user (id, username, password) values(1, 'admin', '$2a$10$APR151lpfgfVeaX6tjaJbOqaE0XOCFHIExRaKlJZsuq1ToS3mcCkC');
+	insert into user (id, username, password) values(2, 'user', '$2a$10$APR151lpfgfVeaX6tjaJbOqaE0XOCFHIExRaKlJZsuq1ToS3mcCkC');
+
+After save the encrypted password into database, we have to decode it. So we use spring library **BCrypt password encoder**. It's very simple to use : 
+
+	DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+	provider.setPasswordEncoder(new);
+	
+
