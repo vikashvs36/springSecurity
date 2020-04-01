@@ -148,4 +148,37 @@ UserDetailsService is not an alternative to AuthenticationProvider but it is use
 		return provider;
 	}
 	
+With the help of AuthenticationProvider we can implement login through Data base as you can see above. the method AuthenticationProvider authProvider() will be define in SecurityConfig class. UserDetailsService interface has been implemented by custom UserDetailsServiceImpl class where override one method loadUserByUsername(String username).
+Which is given below:
+
+	@Service
+	public class UserDetailsServiceImpl implements UserDetailsService {
+
+		@Autowired
+		private UserService userService;
+	
+		@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		
+			User user = userService.findByUsername(username);
+			if (user == null)
+				throw new UsernameNotFoundException("User 404");
+			
+			return new UserPrincipal(user);
+		}
+	}
+	
+The Return type of the method loadUserByUsername(String username) is UserDetails which is a interface. But we have to return UserDetails object and one side we can't create
+the object of interface. So, we have to implement UserDetails and override all methods is given below :
+
+	public class UserPrincipal implements UserDetails {
+		private User user;
+	
+		public UserPrincipal(User user) {
+			super();
+			this.user = user;
+		}
+		
+		// Override All methods.
+	}
 	
