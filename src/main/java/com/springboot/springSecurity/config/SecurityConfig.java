@@ -37,14 +37,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return provider;
 	}
 	
-	/*
-	 * @Override protected void configure(HttpSecurity http) throws Exception {
-	 * 
-	 * http.cors().disable().authorizeRequests().antMatchers("/api/admin/**").
-	 * hasAnyRole("ADMIN").and()
-	 * .authorizeRequests().antMatchers("/api/user/**").hasAnyRole("USER",
-	 * "ADMIN").and().formLogin(); }
-	 */
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		/*
+		 * http.cors().disable()
+		 * .authorizeRequests().antMatchers("/api/admin/**").hasAnyRole("ADMIN") .and()
+		 * .authorizeRequests().antMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+		 * .and().formLogin();
+		 */
+		
+		http.cors().disable()
+			.authorizeRequests()
+			.antMatchers("/home").permitAll()
+			.anyRequest().authenticated()
+			.and()
+			.formLogin().loginPage("/login").defaultSuccessUrl("/dashboard").permitAll()
+			.and()
+			.logout()
+			.deleteCookies("remove").invalidateHttpSession(false)
+            .logoutUrl("/logout") // Default logoutUrl is /logout, you can add custom logout Url.
+            .logoutSuccessUrl("/logout-success").permitAll();
+		
+	} 
 	 
 	
 	/*

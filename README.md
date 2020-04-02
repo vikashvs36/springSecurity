@@ -1,8 +1,8 @@
 # Spring Security in Spring Boot
 
-## Project Setup
+### Project Setup
 
->### Modules used for Application 
+>### * Modules used for Application 
 
  * Java 8
  * Spring Boot
@@ -10,14 +10,16 @@
  * Maven
  * Git
 
->### Added Dependency 
+>### * Added Dependency 
 
  * Web
  * JPA
  * H2
  * DevTool
  * Spring Security 
->### application.properties
+ * Thymeleaf 
+ 
+>### * application.properties
 
 	# Configure H2 database
 	spring.datasource.url=jdbc:h2:mem:testdb
@@ -28,7 +30,7 @@
 
 **Note :** We can get the records on /h2-console to manage the database. 
 
->### Created API
+### * Created API
 
 There are created three API. First two is for User role and the last and third one is created for Admin role.
 
@@ -44,7 +46,7 @@ There are created three API. First two is for User role and the last and third o
 	
 **Note :** data.sql file is created for insert user details in user table at initial time.
 
->### Spring Security Dependency
+### * Spring Security Dependency
 
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
@@ -66,7 +68,7 @@ You can customize the **Username** and **password** from **application.propertie
 	spring.security.user.password= pass
 
 
->### Security in a Spring MVC Application
+### * Security in a Spring MVC Application
 
 We can either implements the interface called WebSecurityConfigurer or extend the more convenient class called WebSecurityConfigurerAdapter. The advantage of extending the adapter class is that we can configure Web security by overriding only those parts that we are interested in; others can remain their default form.
 
@@ -108,7 +110,7 @@ We can either implements the interface called WebSecurityConfigurer or extend th
 
 **Note :** The default filter chain is fine for most needs.
 
->### UserDetailsService userDetailsService(); 
+### * UserDetailsService userDetailsService(); 
  
 * Core interface which loads user-specific data. 
 * It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider.
@@ -132,7 +134,7 @@ We can either implements the interface called WebSecurityConfigurer or extend th
 		return new InMemoryUserDetailsManager(userDetails);
 	}	 
 
->### Login through Database
+### * Login through Database
 
 > AuthenticationProvider vs UserDetailsService
 
@@ -184,7 +186,7 @@ the object of interface. So, we have to implement UserDetails and override all m
 		// Override All methods.
 	}
 	
->### BCrypt Password Encoder
+### * BCrypt Password Encoder
 	
 Here we are using plane text password to login but as you know it will have to change into encrypted for protected or safety purpose. So I am going to use Secure Hash Algorithms (SHA) key because it's give facility to use your password how much small or larger, It will give output constant length.
 
@@ -198,4 +200,60 @@ After save the encrypted password into database, we have to decode it. So we use
 	DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 	provider.setPasswordEncoder(new);
 	
+
+### * Customize Login And Logout Page
+We are going to develop a Login and Logout logic using Spring Security Features. We will develop this application with the following features:
+
+* Home Page
+* Login Page
+* Dashboard Page
+* Logout Feature
+
+> Added Thymeleaf dependency
+
+Added Thymeleaf dependency to add login and logout page to create customize login and logout page in spring security.
+
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-thymeleaf</artifactId>
+	</dependency>
+
+> Added custom form page
+
+Specifies to support form based authentication. If FormLoginConfigurer.loginPage(String) is not specified a default login page will be generated.
+
+	http.authorizeRequests().antMatchers("/**").hasRole("USER")
+		  .and()
+		  .formLogin()
+        .usernameParameter("username") // default is username
+        .passwordParameter("password") // default is password
+
+> Added custom login page
+
+The most basic configuration defaults to automatically generating a login page at the URL "/login", redirecting to "/login?error" for authentication failure. The details of the login page can be found on FormLoginConfigurer.loginPage(String)
+	
+	http.authorizeRequests().antMatchers("/**").hasRole("USER").and().formLogin()
+		.loginPage("/authentication/login") // default is /login with an HTTP get
+      .failureUrl("/authentication/login?failed") // default is /login?error
+      .loginProcessingUrl("/authentication/login/process"); // default is /login
+      .permitAll()
+      // Logout code.
+      .and().logout();
+
+> Added custom logout page
+
+Provides logout support. This is automatically applied when using WebSecurityConfigurerAdapter. The default is that accessing the URL "/logout" will log the user out by invalidating the HTTP Session, cleaning up any rememberMe() authentication that was configured, clearing the SecurityContextHolder, and then redirect to "/login?success".
+
+The following customization to log out when the URL "/custom-logout" is invoked. Log out will remove the cookie named "remove", not invalidate the HttpSession, clear the SecurityContextHolder, and upon completion redirect to "/logout-success".
+
+	http.authorizeRequests().antMatchers("/**").hasRole("USER").and().formLogin()
+		.and()
+      // sample logout customization
+      .logout().deleteCookies("remove").invalidateHttpSession(false)
+      .logoutUrl("/custom-logout").logoutSuccessUrl("/logout-success");
+
+* **logoutUrl("/custom-logout")** is used to define custom logout service created by your own, bydefault spring security use **logoutUrl("/logout")**
+* **logoutSuccessUrl("/logout-success")** is used to define place where we can land after logout.
+
+For more details of Custom login/logout Configuration, please visit spring doc [click here](https://docs.spring.io/spring-security/site/docs/4.2.13.RELEASE/apidocs/org/springframework/security/config/annotation/web/builders/HttpSecurity.html).
 
