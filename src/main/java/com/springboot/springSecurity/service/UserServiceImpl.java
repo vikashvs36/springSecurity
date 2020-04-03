@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.springboot.springSecurity.dao.UserDao;
 import com.springboot.springSecurity.model.User;
@@ -31,5 +33,15 @@ public class UserServiceImpl implements UserService {
 	public List<User> findAll() {
 		return userDao.findAll();
 	}
+
+	@Override
+	public User save(User user) {
+		if(!StringUtils.isEmpty(user.getPassword())) {
+			user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+		}
+		return userDao.save(user);
+	}
+	
+	
 	
 }
