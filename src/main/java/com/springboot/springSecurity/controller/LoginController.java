@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import com.springboot.springSecurity.model.User;
 import com.springboot.springSecurity.service.UserService;
@@ -16,6 +17,10 @@ public class LoginController {
 
 	@Autowired
 	private UserService userService;
+	
+	// Autowired ClassLoaderTemplateResolver to define custom template configuration. 
+	@Autowired
+	private ClassLoaderTemplateResolver templateResolver; 
 	
 	@GetMapping(path = "/home")
 	public ModelAndView home() {
@@ -27,6 +32,10 @@ public class LoginController {
 	public ModelAndView register() {
 		System.out.println("com.springboot.springSecurity.controller.LoginController.register() : ");
 		ModelAndView modelAndView = new ModelAndView("register");
+
+		// Set customize template path
+		/* templateResolver.setPrefix("templates/"); */
+		
 		return modelAndView;
 	}
 	
